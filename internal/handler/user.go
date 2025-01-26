@@ -1,8 +1,8 @@
 package handler
 
 import (
+	"jorgerr9011/wiki-golang/internal/model"
 	"jorgerr9011/wiki-golang/pkg/db"
-	"jorgerr9011/wiki-golang/pkg/model"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
