@@ -15,12 +15,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    environment:
-      DB_USER: gorm
-      DB_PASSWORD: gorm_password
-      DB_NAME: gorm
-      DB_HOST: db
-      DB_PORT: 5432
     depends_on:
       - db
     ports:

@@ -21,4 +21,4 @@ RUN go mod download
 EXPOSE 8080
 
 # Comando para compilar y ejecutar la aplicación
-CMD ["sh", "-c", "go build -o main cmd/server/main.go && ./main"]
+CMD ["sh", "-c", "go build -o main cmd/api/main.go && ./main"]

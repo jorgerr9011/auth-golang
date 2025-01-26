@@ -17,5 +17,3 @@
 ## Aplicar migraciones
 
 `docker exec -it wiki-golang_app_1 migrate -path /app/migrations -database "postgres://gorm:gorm_password@db:5432/gorm?sslmode=disable" up`
-
-
