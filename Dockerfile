@@ -1,29 +1,24 @@
-# Etapa 1: Construcción de la aplicación
-FROM golang:1.22-alpine as builder
+# Imagen base con Go y herramientas necesarias
+FROM golang:1.23-alpine
 
-# Establecer el directorio de trabajo en /app
+# Instala migrate con soporte para PostgreSQL
+RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+
+# Configuración del directorio de trabajo
 WORKDIR /app
 
-# Copiar todo el contenido al contenedor
-COPY . .
+# Copiar los archivos de configuración de dependencias
+COPY go.mod go.sum ./
 
-# Instalar las dependencias de Go
-RUN go mod tidy
+# Descargar las dependencias del proyecto
+RUN go mod download
 
-# Construir la aplicación para un entorno Linux (amd64)
-RUN GOOS=linux GOARCH=amd64 go build -o app ./cmd/server/main.go
-
-# Etapa 2: Imagen más ligera para producción
-FROM alpine:latest
-
-# Establecer el directorio de trabajo en /root
-WORKDIR /root/
-
-# Copiar el binario desde la etapa de construcción
-COPY --from=builder /app/app .
+# Como ya me monto un volumen con los archivos no hace falta
+# Copiar todo el código fuente
+#COPY . .
 
 # Exponer el puerto de la aplicación
 EXPOSE 8080
 
-# Ejecutar la aplicación
-CMD ["./app"]
+# Comando para compilar y ejecutar la aplicación
+CMD ["sh", "-c", "go build -o main cmd/server/main.go && ./main"]
