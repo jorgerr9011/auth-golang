@@ -4,28 +4,42 @@ package db
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"jorgerr9011/wiki-golang/pkg/config"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	gormLogger "gorm.io/gorm/logger"
 )
 
-type Database struct {
-	db *gorm.DB
+const DatabaseTimeout = 5 * time.Second
+
+type IDatabase interface {
+	GetDB() *gorm.DB
 }
 
-// DB es la variable global que mantiene la conexión con la base de datos
-var DB *gorm.DB
+type Database struct {
+	database *gorm.DB
+}
 
-// InitDB inicializa la conexión con la base de datos PostgreSQL
-func NewDatabase(uri string) {
-	var err error
-	DB, err = gorm.Open(postgres.Open(uri), &gorm.Config{})
+// Inicializa la conexión con la base de datos PostgreSQL
+func NewDatabase(uri string) (*Database, error) {
+
+	DB, err := gorm.Open(postgres.Open(uri), &gorm.Config{
+		Logger: gormLogger.Default.LogMode(gormLogger.Warn),
+	})
+
 	if err != nil {
 		log.Fatalf("Error al conectar a la base de datos: %v", err)
+		return nil, err
 	}
+
 	log.Println("Conexión a la base de datos establecida exitosamente.")
+
+	return &Database{
+		database: DB,
+	}, nil
 }
 
 // GenerateDSN genera un Data Source Name (DSN) para la conexión a la base de datos.
@@ -39,4 +53,8 @@ func GenerateDSN(cfg config.Config) string {
 		cfg.Db_host, cfg.Db_user, cfg.Db_password, cfg.Db_name, cfg.Db_port)
 
 	return dsn
+}
+
+func (d *Database) GetDB() *gorm.DB {
+	return d.database
 }
