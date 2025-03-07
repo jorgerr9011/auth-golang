@@ -22,8 +22,17 @@
 
 `docker exec -it wiki-golang_app_1 migrate -path=/app/migrations -database "postgres://gorm:gorm_password@db:5432/gorm?sslmode=disable" drop -f`
 
+## Seeders
+
+* Para ejecutar los seeders de manera manual:
+
+	`go run `
+
 ## Añadidos:
 
 - Serie interesante hacer un componente que pagine objetos
 
-# Repo: https://github.com/quangdangfit/goshop/
+## Autenticación:
+
+- JWT
+
