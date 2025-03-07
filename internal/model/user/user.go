@@ -1,6 +1,8 @@
 package model
 
-import "gorm.io/gorm"
+import (
+	"time"
+)
 
 /*
 	Con gorm.Model ya se crean los siguientes campos:
@@ -32,7 +34,14 @@ import "gorm.io/gorm"
 */
 
 type User struct {
-	gorm.Model
-	Name  string `json:"name"`
-	Email string `json:"email"`
+	ID        uint       `gorm:"primaryKey"`
+	Name      string     `gorm:"size:100;not null"`
+	Email     string     `gorm:"size:100;unique;not null"`
+	Password  string     `gorm:"size:255;not null"`
+	Username  string     `gorm:"size:100;unique;not null"`
+	Phone     string     `gorm:"size:9;not null"`
+	LastLogin time.Time  `gorm:"default:null"`
+	CreatedAt time.Time  `gorm:"default:CURRENT_TIMESTAMP"`
+	UpdatedAt time.Time  `gorm:"default:CURRENT_TIMESTAMP"`
+	DeletedAt *time.Time `gorm:"index"`
 }

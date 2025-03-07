@@ -8,7 +8,7 @@ import (
 	"log"
 )
 
-type IProductService interface {
+type IUserService interface {
 	GetAllUsers(c context.Context, req *dto.ListUserReq) ([]*model.User, error)
 	GetUserByID(ctx context.Context, id string) (*model.User, error)
 	CreateUser(ctx context.Context, req *dto.CreateUserReq) (*model.User, error)
@@ -60,14 +60,12 @@ func (s *UserService) CreateUser(ctx context.Context, req *dto.CreateUserReq) (*
 }
 
 func (s *UserService) UpdateUser(ctx context.Context, id string, req *dto.UpdateUserReq) (*model.User, error) {
-	// Obtener el usuario actual desde el repositorio
 	user, err := s.repo.GetById(ctx, id)
 	if err != nil {
 		log.Printf("Error getting user by ID: %v", err)
 		return nil, err
 	}
 
-	// Mapear los campos que vienen del DTO al modelo
 	if req.Name != "" {
 		user.Name = req.Name
 	}
@@ -75,13 +73,11 @@ func (s *UserService) UpdateUser(ctx context.Context, id string, req *dto.Update
 		user.Email = req.Email
 	}
 
-	// Actualizar el usuario en el repositorio
 	if err := s.repo.Update(ctx, user); err != nil {
 		log.Printf("Error updating user: %v", err)
 		return nil, err
 	}
 
-	// Retornar el usuario actualizado
 	return user, nil
 }
 
