@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"log"
 	"time"
 
 	model "jorgerr9011/wiki-golang/internal/model/user"
@@ -16,13 +17,13 @@ type IUserRepository interface {
 	GetAll(ctx context.Context, req *dto.ListUserReq) ([]*model.User, error)
 	GetById(ctx context.Context, id string) (*model.User, error)
 	Delete(ctx context.Context, id string) error
+	GetByEmail(ctx context.Context, email string) (*model.User, error)
 }
 
 type userRepository struct {
 	db *gorm.DB
 }
 
-// NewUserRepository crea una nueva instancia del repositorio de usuarios
 func NewUserRepository(db *gorm.DB) IUserRepository {
 	return &userRepository{db: db}
 }
@@ -63,4 +64,13 @@ func (r *userRepository) Delete(ctx context.Context, id string) error {
 		return err
 	}
 	return nil
+}
+
+func (r *userRepository) GetByEmail(ctx context.Context, email string) (*model.User, error) {
+	var user model.User
+	if err := r.db.WithContext(ctx).Where("email = ?", email).First(&user).Error; err != nil {
+		log.Println("No se ha encontrado un usuario con el mismo correo:", err)
+		return nil, err
+	}
+	return &user, nil
 }
