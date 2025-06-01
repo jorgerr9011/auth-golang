@@ -29,11 +29,11 @@ type ListUserRes struct {
 
 // CreateUserReq es la solicitud para crear un nuevo usuario
 type CreateUserReq struct {
-	Name     string `json:"name" validate:"required"`
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required,min=8"`
-	Username string `json:"username" validate:"required,alphanum"`
-	Phone    string `json:"phone" validate:"required,len=9,numeric"`
+	Name     string `json:"name" binding:"required"`
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required,min=8"`
+	Username string `json:"username" binding:"required,alphanum"`
+	Phone    string `json:"phone" binding:"required,len=9,numeric"`
 }
 
 // UpdateUserReq es la solicitud para actualizar un usuario
