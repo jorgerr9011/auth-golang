@@ -13,6 +13,7 @@ type Config struct {
 	Db_name     string
 	Db_host     string
 	Db_port     string
+	Jwt_secret  string
 }
 
 func LoadConfig() (*Config, error) {
@@ -30,6 +31,7 @@ func LoadConfig() (*Config, error) {
 		Db_name:     getEnv("db_name", "default_db"),
 		Db_host:     getEnv("db_host", "localhost"),
 		Db_port:     getEnv("db_port", "5432"),
+		Jwt_secret:  getEnv("JWT_SECRET", "123456789"),
 	}, nil
 }
 

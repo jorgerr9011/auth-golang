@@ -5,70 +5,61 @@ import (
 	"net/http"
 	"strings"
 
+	"jorgerr9011/wiki-golang/pkg/config"
+
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 )
 
-func JWTAuthMiddleware(secretKey string) gin.HandlerFunc {
+func JWTAuthMiddleware(cfg config.Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Obtener el token del encabezado "Authorization"
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header is required"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "authorization header missing"})
 			c.Abort()
 			return
 		}
 
-		// Eliminar el prefijo "Bearer " del token
-		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-		if tokenString == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Bearer token is required"})
+		parts := strings.SplitN(authHeader, " ", 2)
+		if len(parts) != 2 || parts[0] != "Bearer" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "authorization header format must be Bearer {token}"})
 			c.Abort()
 			return
 		}
 
-		// Validar el token
+		tokenString := parts[1]
+
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			// Verifica el método de firma del token (debe ser HMAC)
+			// Verifica método de firma
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 			}
-			// Devuelve la clave secreta para validar el token
-			return []byte(secretKey), nil
+			return []byte(cfg.Jwt_secret), nil
 		})
 
 		if err != nil || !token.Valid {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired token"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
 			c.Abort()
 			return
 		}
 
-		// Si el token es válido, se permite continuar con la solicitud
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid token claims"})
+			c.Abort()
+			return
+		}
+
+		userID, ok := claims["user_id"].(float64) // jwt MapClaims guarda números como float64
+		if !ok {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid userID in token"})
+			c.Abort()
+			return
+		}
+
+		// Guarda el userID como int64 o lo que uses
+		c.Set("userID", int64(userID))
+
 		c.Next()
 	}
 }
-
-/*
-func AuthMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		authHeader := c.GetHeader("Authorization")
-		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Token no proporcionado"})
-			c.Abort()
-			return
-		}
-
-		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
-		claims, err := auth.ValidateToken(tokenString)
-		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Token inválido"})
-			c.Abort()
-			return
-		}
-
-		// Almacenar los claims en el contexto para usarlos en otras partes
-		c.Set("user_id", claims["user_id"])
-		c.Next()
-	}
-}
-*/

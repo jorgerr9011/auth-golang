@@ -6,6 +6,7 @@ import (
 	"jorgerr9011/wiki-golang/internal/service"
 	"jorgerr9011/wiki-golang/pkg/config"
 	"jorgerr9011/wiki-golang/pkg/db"
+	"jorgerr9011/wiki-golang/pkg/middleware"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -49,13 +50,14 @@ func main() {
 	router.POST("/api/auth/login", authController.LoginUser)
 	//}
 
-	api := router.Group("/api/users")
+	authorized := router.Group("/api/users")
+	authorized.Use(middleware.JWTAuthMiddleware(*cfg))
 	{
-		api.POST("/", userController.CreateUser)
-		api.GET("/", userController.GetUsers)
-		api.GET("/:id", userController.GetUser)
-		api.PUT("/:id", userController.UpdateUser)
-		api.DELETE("/:id", userController.DeleteUser)
+		authorized.POST("/", userController.CreateUser)
+		authorized.GET("/", userController.GetUsers)
+		authorized.GET("/:id", userController.GetUser)
+		authorized.PUT("/:id", userController.UpdateUser)
+		authorized.DELETE("/:id", userController.DeleteUser)
 	}
 
 	if err := router.Run(":8080"); err != nil {

@@ -2,12 +2,29 @@ package auth
 
 import (
 	"errors"
+	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/joho/godotenv"
 )
 
-var jwtSecret = []byte("my_secret_key") // Clave secreta para firmar los tokens
+var jwtSecret []byte
+
+func init() {
+	// Carga el .env (puedes cargarlo también en main, pero por si acaso lo haces aquí)
+	err := godotenv.Load()
+	if err != nil {
+		panic("Error cargando archivo .env")
+	}
+
+	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
+		panic("JWT_SECRET no está definido en .env")
+	}
+
+	jwtSecret = []byte(secret)
+}
 
 // GenerateToken genera un JWT con información del usuario
 func GenerateToken(userID uint) (string, error) {

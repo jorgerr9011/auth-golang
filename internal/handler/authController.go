@@ -21,7 +21,7 @@ func NewAuthController(authService *service.AuthService) *AuthController {
 func (ctrl *AuthController) RegisterUser(c *gin.Context) {
 	var req dto.CreateUserReq
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Datos inválidos"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -66,5 +66,8 @@ func (ctrl *AuthController) LoginUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": token})
+	c.JSON(http.StatusOK, gin.H{
+		"token": token,
+		"user":  user,
+	})
 }
