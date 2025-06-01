@@ -12,25 +12,21 @@
 
 * Esto crea 2 ficheros, uno up y otro down
 
-	`docker exec -it wiki-golang_app_1 migrate create -ext sql -dir migrations -seq create_documents_table`
+	`docker exec -it auth-golang-app migrate create -ext sql -dir migrations -seq create_users_table`
 
 ## Aplicar migraciones
 
-`docker exec -it wiki-golang_app_1 migrate -path /app/migrations -database "postgres://gorm:gorm_password@db:5432/gorm?sslmode=disable" up`
+`docker exec -it auth-golang-app migrate -path /app/migrations -database "postgres://gorm:gorm_password@db:5432/gorm?sslmode=disable" up`
 
 # Realizar un fresh de las migraciones
 
-`docker exec -it wiki-golang_app_1 migrate -path=/app/migrations -database "postgres://gorm:gorm_password@db:5432/gorm?sslmode=disable" drop -f`
+`docker exec -it auth-golang-app migrate -path=/app/migrations -database "postgres://gorm:gorm_password@db:5432/gorm?sslmode=disable" drop -f`
 
 ## Seeders
 
 * Para ejecutar los seeders de manera manual:
 
 	`go run `
-
-## Añadidos:
-
-- Serie interesante hacer un componente que pagine objetos
 
 ## Autenticación:
 
