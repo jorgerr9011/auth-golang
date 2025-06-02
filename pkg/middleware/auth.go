@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	"jorgerr9011/wiki-golang/pkg/config"
+	"jorgerr9011/auth-golang/pkg/config"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"

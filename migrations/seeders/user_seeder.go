@@ -2,7 +2,7 @@ package seeders
 
 import (
 	"fmt"
-	"jorgerr9011/wiki-golang/migrations/factories"
+	"jorgerr9011/auth-golang/migrations/factories"
 	"log"
 
 	"gorm.io/gorm"

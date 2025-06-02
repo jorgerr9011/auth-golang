@@ -10,6 +10,7 @@ import (
 )
 
 var jwtSecret []byte
+var jwtRefreshSecret []byte
 
 func init() {
 	// Carga el .env (puedes cargarlo también en main, pero por si acaso lo haces aquí)
@@ -19,15 +20,17 @@ func init() {
 	}
 
 	secret := os.Getenv("JWT_SECRET")
-	if secret == "" {
-		panic("JWT_SECRET no está definido en .env")
+	refreshSecret := os.Getenv("JWT_REFRESH_SECRET")
+	if secret == "" || refreshSecret == "" {
+		panic("JWT_SECRET o JWT_REFRESH_SECRET no está definido en .env")
 	}
 
 	jwtSecret = []byte(secret)
+	jwtRefreshSecret = []byte(refreshSecret)
 }
 
 // GenerateToken genera un JWT con información del usuario
-func GenerateToken(userID uint) (string, error) {
+func GenerateAccessToken(userID uint) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": userID,
 		"exp":     time.Now().Add(time.Hour * 24).Unix(), // Expiración del token (24 horas)
@@ -35,6 +38,15 @@ func GenerateToken(userID uint) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString(jwtSecret)
+}
+
+func GenerateRefreshToken(userID uint) (string, error) {
+	claims := jwt.MapClaims{
+		"sub": userID,
+		"exp": time.Now().Add(7 * 24 * time.Hour).Unix(), // 7 días
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString(jwtRefreshSecret)
 }
 
 // ValidateToken valida un token JWT y retorna los claims

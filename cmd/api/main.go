@@ -1,12 +1,12 @@
 package main
 
 import (
-	"jorgerr9011/wiki-golang/internal/handler"
-	"jorgerr9011/wiki-golang/internal/repository"
-	"jorgerr9011/wiki-golang/internal/service"
-	"jorgerr9011/wiki-golang/pkg/config"
-	"jorgerr9011/wiki-golang/pkg/db"
-	"jorgerr9011/wiki-golang/pkg/middleware"
+	"jorgerr9011/auth-golang/internal/handler"
+	"jorgerr9011/auth-golang/internal/repository"
+	"jorgerr9011/auth-golang/internal/service"
+	"jorgerr9011/auth-golang/pkg/config"
+	"jorgerr9011/auth-golang/pkg/db"
+	"jorgerr9011/auth-golang/pkg/middleware"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -32,16 +32,14 @@ func main() {
 	// Ejecuta los seeders
 	//seeders.RunSeeders(database.GetDB())
 
-	repo := repository.NewUserRepository(database.GetDB())
-	userService := service.NewUserService(repo)
-	authService := service.NewAuthService(repo)
+	userRepo := repository.NewUserRepository(database.GetDB())
+	refreshTokenRepo := repository.NewRefreshTokenRepository(database.GetDB())
+	userService := service.NewUserService(userRepo)
+	authService := service.NewAuthService(userRepo, refreshTokenRepo)
 	userController := handler.NewUserController(userService)
 	authController := handler.NewAuthController(authService)
 
 	router := gin.Default()
-
-	// Este uso de variable de entorno es temporal
-	//router.Use(middleware.JWTAuthMiddleware(os.Getenv("JWT_SECRET_KEY")))
 
 	// Rutas públicas
 	//auth := router.Group("/api/auth")

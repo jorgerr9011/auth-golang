@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"jorgerr9011/wiki-golang/internal/model/user/dto"
-	"jorgerr9011/wiki-golang/internal/service"
+	"jorgerr9011/auth-golang/internal/model/user/dto"
+	"jorgerr9011/auth-golang/internal/service"
 	"log"
 	"net/http"
 

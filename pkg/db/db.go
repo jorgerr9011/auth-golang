@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	"jorgerr9011/wiki-golang/pkg/config"
+	"jorgerr9011/auth-golang/pkg/config"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

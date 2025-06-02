@@ -1,11 +1,12 @@
 package handler
 
 import (
-	"jorgerr9011/wiki-golang/internal/model/user/dto"
-	"jorgerr9011/wiki-golang/internal/service"
-	"jorgerr9011/wiki-golang/pkg/auth"
+	"jorgerr9011/auth-golang/internal/model/user/dto"
+	"jorgerr9011/auth-golang/internal/service"
+	"jorgerr9011/auth-golang/pkg/auth"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -33,16 +34,24 @@ func (ctrl *AuthController) RegisterUser(c *gin.Context) {
 	}
 
 	// Generar JWT para el usuario registrado
-	token, err := auth.GenerateToken(user.ID)
-	if err != nil {
-		log.Println("Error generating JWT: ", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error generating JWT"})
+	token, err := auth.GenerateAccessToken(user.ID)
+	refreshToken, errRefresh := auth.GenerateRefreshToken(user.ID)
+	if err != nil || errRefresh != nil {
+		log.Println("Error generating tokens: ", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error generating tokens"})
+		return
+	}
+
+	expiresAt := time.Now().Add(7 * 24 * time.Hour) // 7 días
+	if err := ctrl.authService.SaveRefreshToken(c.Request.Context(), user.ID, refreshToken, expiresAt); err != nil {
+		log.Println("Error guardando refresh token:", err)
 		return
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
-		"user":  user,
-		"token": token,
+		"user":          user,
+		"access_token":  token,
+		"refresh_token": refreshToken,
 	})
 }
 
@@ -60,14 +69,22 @@ func (ctrl *AuthController) LoginUser(c *gin.Context) {
 	}
 
 	// Generar token JWT
-	token, err := auth.GenerateToken(user.ID)
-	if err != nil {
+	token, err := auth.GenerateAccessToken(user.ID)
+	refreshToken, errRefresh := auth.GenerateRefreshToken(user.ID)
+	if err != nil || errRefresh != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al generar token"})
 		return
 	}
 
+	expiresAt := time.Now().Add(7 * 24 * time.Hour) // 7 días
+	if err := ctrl.authService.SaveRefreshToken(c.Request.Context(), user.ID, refreshToken, expiresAt); err != nil {
+		log.Println("Error guardando refresh token:", err)
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"token": token,
-		"user":  user,
+		"user":          user,
+		"access_token":  token,
+		"refresh_token": refreshToken,
 	})
 }

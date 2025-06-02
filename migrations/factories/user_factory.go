@@ -2,7 +2,7 @@ package factories
 
 import (
 	"fmt"
-	model "jorgerr9011/wiki-golang/internal/model/user"
+	model "jorgerr9011/auth-golang/internal/model/user"
 	"math/rand"
 	"time"
 

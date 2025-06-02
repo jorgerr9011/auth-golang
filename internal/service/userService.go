@@ -2,9 +2,9 @@ package service
 
 import (
 	"context"
-	model "jorgerr9011/wiki-golang/internal/model/user"
-	"jorgerr9011/wiki-golang/internal/model/user/dto"
-	"jorgerr9011/wiki-golang/internal/repository"
+	model "jorgerr9011/auth-golang/internal/model/user"
+	"jorgerr9011/auth-golang/internal/model/user/dto"
+	"jorgerr9011/auth-golang/internal/repository"
 	"log"
 )
 

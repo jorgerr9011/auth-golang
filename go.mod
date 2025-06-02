@@ -1,4 +1,4 @@
-module jorgerr9011/wiki-golang
+module jorgerr9011/auth-golang
 
 go 1.22.0
 
