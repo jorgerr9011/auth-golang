@@ -87,3 +87,26 @@ func (s *AuthService) SaveRefreshToken(ctx context.Context, userID uint, token s
 	}
 	return s.refreshTokenRepo.Create(ctx, rt)
 }
+
+func (s *AuthService) ValidateAndUseRefreshToken(ctx context.Context, tokenStr string) (*userModel.User, error) {
+	// Buscar el token en la base de datos
+	rt, err := s.refreshTokenRepo.FindByToken(ctx, tokenStr)
+	if err != nil || rt == nil {
+		return nil, errors.New("refresh token inválido")
+	}
+
+	// Eliminar el token expirado
+	if rt.ExpiresAt.Before(time.Now()) {
+		_ = s.refreshTokenRepo.DeleteByID(ctx, rt.ID)
+		return nil, errors.New("refresh token expirado")
+	}
+
+	// Obtener el usuario relacionado
+	user, err := s.repo.GetById(ctx, rt.UserID)
+	if err != nil || user == nil {
+		return nil, errors.New("usuario no encontrado")
+	}
+
+	// Aquí podrías generar un nuevo access token si todo está OK
+	return user, nil
+}

@@ -28,7 +28,7 @@ func NewUserService(
 	}
 }
 
-func (s *UserService) GetUserByID(ctx context.Context, id string) (*model.User, error) {
+func (s *UserService) GetUserByID(ctx context.Context, id uint) (*model.User, error) {
 	user, err := s.repo.GetById(ctx, id)
 	if err != nil {
 		return nil, err
@@ -59,7 +59,7 @@ func (s *UserService) CreateUser(ctx context.Context, req *dto.CreateUserReq) (*
 	return user, nil
 }
 
-func (s *UserService) UpdateUser(ctx context.Context, id string, req *dto.UpdateUserReq) (*model.User, error) {
+func (s *UserService) UpdateUser(ctx context.Context, id uint, req *dto.UpdateUserReq) (*model.User, error) {
 	user, err := s.repo.GetById(ctx, id)
 	if err != nil {
 		log.Printf("Error getting user by ID: %v", err)
@@ -81,7 +81,7 @@ func (s *UserService) UpdateUser(ctx context.Context, id string, req *dto.Update
 	return user, nil
 }
 
-func (s *UserService) DeleteUser(ctx context.Context, id string) error {
+func (s *UserService) DeleteUser(ctx context.Context, id uint) error {
 	if err := s.repo.Delete(ctx, id); err != nil {
 		log.Printf("Error deleting user: %v", err)
 		return err

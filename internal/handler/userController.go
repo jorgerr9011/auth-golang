@@ -5,6 +5,7 @@ import (
 	"jorgerr9011/auth-golang/internal/service"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -37,9 +38,10 @@ func (ctrl *UserController) CreateUser(c *gin.Context) {
 }
 
 func (ctrl *UserController) GetUser(c *gin.Context) {
-	id := c.Param("id")
+	idStr := c.Param("id")
+	id, nil := strconv.ParseUint(idStr, 10, 32)
 
-	user, err := ctrl.userService.GetUserByID(c, id)
+	user, err := ctrl.userService.GetUserByID(c, uint(id))
 	if err != nil {
 		log.Printf("Error getting user by ID: %v", err)
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
@@ -51,7 +53,8 @@ func (ctrl *UserController) GetUser(c *gin.Context) {
 
 func (ctrl *UserController) UpdateUser(c *gin.Context) {
 
-	id := c.Param("id")
+	idStr := c.Param("id")
+	id, nil := strconv.ParseUint(idStr, 10, 32)
 	var req dto.UpdateUserReq
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -60,7 +63,7 @@ func (ctrl *UserController) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	user, err := ctrl.userService.UpdateUser(c, id, &req)
+	user, err := ctrl.userService.UpdateUser(c, uint(id), &req)
 	if err != nil {
 		log.Printf("Error updating user: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
@@ -71,9 +74,10 @@ func (ctrl *UserController) UpdateUser(c *gin.Context) {
 }
 
 func (ctrl *UserController) DeleteUser(c *gin.Context) {
-	id := c.Param("id")
+	idStr := c.Param("id")
+	id, nil := strconv.ParseUint(idStr, 10, 32)
 
-	err := ctrl.userService.DeleteUser(c, id)
+	err := ctrl.userService.DeleteUser(c, uint(id))
 	if err != nil {
 		log.Printf("Error deleting user: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user"})

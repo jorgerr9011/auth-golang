@@ -88,3 +88,31 @@ func (ctrl *AuthController) LoginUser(c *gin.Context) {
 		"refresh_token": refreshToken,
 	})
 }
+
+func (ctrl *AuthController) RefreshToken(c *gin.Context) {
+	var req struct {
+		RefreshToken string `json:"refresh_token" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "refresh_token requerido"})
+		return
+	}
+
+	user, err := ctrl.authService.ValidateAndUseRefreshToken(c.Request.Context(), req.RefreshToken)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Generar nuevo access token
+	newAccessToken, err := auth.GenerateAccessToken(user.ID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "error al generar nuevo access token"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"access_token": newAccessToken,
+	})
+}

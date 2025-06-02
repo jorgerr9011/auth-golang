@@ -46,6 +46,7 @@ func main() {
 	//{
 	router.POST("/api/auth/register", authController.RegisterUser)
 	router.POST("/api/auth/login", authController.LoginUser)
+	router.POST("/api/auth/refresh", authController.RefreshToken)
 	//}
 
 	authorized := router.Group("/api/users")
