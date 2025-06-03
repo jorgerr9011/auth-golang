@@ -22,6 +22,7 @@ func NewAuthController(authService *service.AuthService) *AuthController {
 func (ctrl *AuthController) RegisterUser(c *gin.Context) {
 	var req dto.CreateUserReq
 	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Println("Error en la validación:", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -64,6 +65,7 @@ func (ctrl *AuthController) LoginUser(c *gin.Context) {
 
 	user, err := ctrl.authService.Authenticate(c.Request.Context(), &req)
 	if err != nil {
+		log.Println("Error credenciales inválidas:", err)
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Credenciales inválidas"})
 		return
 	}
@@ -72,6 +74,7 @@ func (ctrl *AuthController) LoginUser(c *gin.Context) {
 	token, err := auth.GenerateAccessToken(user.ID)
 	refreshToken, errRefresh := auth.GenerateRefreshToken(user.ID)
 	if err != nil || errRefresh != nil {
+		log.Println("Error al generar el token:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al generar token"})
 		return
 	}
@@ -101,6 +104,7 @@ func (ctrl *AuthController) RefreshToken(c *gin.Context) {
 
 	user, err := ctrl.authService.ValidateAndUseRefreshToken(c.Request.Context(), req.RefreshToken)
 	if err != nil {
+		log.Println("Error validando refresh token:", err)
 		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
@@ -108,6 +112,7 @@ func (ctrl *AuthController) RefreshToken(c *gin.Context) {
 	// Generar nuevo access token
 	newAccessToken, err := auth.GenerateAccessToken(user.ID)
 	if err != nil {
+		log.Println("Error al generar nuevo access token:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "error al generar nuevo access token"})
 		return
 	}

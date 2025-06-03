@@ -2,6 +2,7 @@
 package db
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"time"
@@ -21,6 +22,7 @@ type IDatabase interface {
 
 type Database struct {
 	database *gorm.DB
+	sqlDB    *sql.DB
 }
 
 // Inicializa la conexión con la base de datos PostgreSQL
@@ -35,10 +37,16 @@ func NewDatabase(uri string) (*Database, error) {
 		return nil, err
 	}
 
+	sqlDB, err := DB.DB()
+	if err != nil {
+		return nil, err
+	}
+
 	log.Println("Conexión a la base de datos establecida exitosamente.")
 
 	return &Database{
 		database: DB,
+		sqlDB:    sqlDB,
 	}, nil
 }
 
@@ -57,4 +65,8 @@ func GenerateDSN(cfg config.Config) string {
 
 func (d *Database) GetDB() *gorm.DB {
 	return d.database
+}
+
+func (d *Database) Close() error {
+	return d.sqlDB.Close()
 }
