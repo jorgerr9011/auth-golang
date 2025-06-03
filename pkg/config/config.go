@@ -17,29 +17,28 @@ type Config struct {
 }
 
 func LoadConfig() (*Config, error) {
-	// Cargar variables del archivo .env
-	err := godotenv.Load()
-	if err != nil {
-		log.Println("No se pudo cargar el archivo .env, asegurando uso de variables de entorno existentes")
-		return nil, err
+	// Carga condicional del .env (solo en desarrollo)
+	if os.Getenv("ENV") != "production" {
+		if err := godotenv.Load(); err != nil {
+			log.Println("No se pudo cargar el archivo .env, usando variables del entorno")
+		}
 	}
 
 	// Leer las variables de entorno
 	return &Config{
-		Db_user:     getEnv("db_user", "default_user"),
-		Db_password: getEnv("db_password", "default_password"),
-		Db_name:     getEnv("db_name", "default_db"),
-		Db_host:     getEnv("db_host", "localhost"),
-		Db_port:     getEnv("db_port", "5432"),
+		Db_user:     getEnv("DB_USER", "default_user"),
+		Db_password: getEnv("DB_PASSWORD", "default_password"),
+		Db_name:     getEnv("DB_NAME", "default_db"),
+		Db_host:     getEnv("DB_HOST", "localhost"),
+		Db_port:     getEnv("DB_PORT", "5432"),
 		Jwt_secret:  getEnv("JWT_SECRET", "123456789"),
 	}, nil
 }
 
 // getEnv obtiene una variable de entorno o devuelve un valor predeterminado
 func getEnv(key, defaultValue string) string {
-	value, exists := os.LookupEnv(key)
-	if !exists {
-		return defaultValue
+	if value, exists := os.LookupEnv(key); exists {
+		return value
 	}
-	return value
+	return defaultValue
 }

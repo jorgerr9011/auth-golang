@@ -1,24 +1,35 @@
-# Imagen base con Go y herramientas necesarias
-FROM golang:1.23-alpine
+FROM golang:1.23-alpine AS builder
 
-# Instala migrate con soporte para PostgreSQL
-RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+RUN apk add --no-cache git
 
-# Configuración del directorio de trabajo
 WORKDIR /app
 
-# Copiar los archivos de configuración de dependencias
 COPY go.mod go.sum ./
-
-# Descargar las dependencias del proyecto
 RUN go mod download
 
-# Como ya me monto un volumen con los archivos no hace falta
-# Copiar todo el código fuente
-#COPY . .
+COPY . .
 
-# Exponer el puerto de la aplicación
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o auth-app cmd/api/main.go
+
+FROM alpine:latest
+
+RUN apk add --no-cache bash curl tar just
+
+RUN adduser -D -g '' appuser
+
+WORKDIR /app
+
+RUN mkdir -p /app/logs && chmod 777 /app/logs
+
+COPY --from=builder /app/auth-app .
+COPY entrypoint.sh .
+
+RUN chmod +x entrypoint.sh
+
+COPY justfile . 
+
+USER appuser
+
 EXPOSE 8080
 
-# Comando para compilar y ejecutar la aplicación
-CMD ["sh", "-c", "go build -o main cmd/api/main.go && ./main"]
+CMD ["./auth-app"]

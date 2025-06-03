@@ -25,29 +25,40 @@ type Database struct {
 	sqlDB    *sql.DB
 }
 
-// Inicializa la conexión con la base de datos PostgreSQL
 func NewDatabase(uri string) (*Database, error) {
+	var DB *gorm.DB
+	var err error
 
-	DB, err := gorm.Open(postgres.Open(uri), &gorm.Config{
-		Logger: gormLogger.Default.LogMode(gormLogger.Warn),
-	})
+	const maxAttempts = 10
+	const waitBetween = 3 * time.Second
 
-	if err != nil {
-		log.Fatalf("Error al conectar a la base de datos: %v", err)
-		return nil, err
+	for attempts := 1; attempts <= maxAttempts; attempts++ {
+		DB, err = gorm.Open(postgres.Open(uri), &gorm.Config{
+			Logger: gormLogger.Default.LogMode(gormLogger.Warn),
+		})
+		if err == nil {
+			sqlDB, err := DB.DB()
+			if err != nil {
+				return nil, err
+			}
+
+			// Verificar conexión ping
+			err = sqlDB.Ping()
+			if err == nil {
+				log.Println("Conexión a la base de datos establecida exitosamente.")
+				return &Database{
+					database: DB,
+					sqlDB:    sqlDB,
+				}, nil
+			}
+		}
+
+		log.Printf("Intento %d/%d: error al conectar a la base de datos: %v. Reintentando en %s...\n",
+			attempts, maxAttempts, err, waitBetween)
+		time.Sleep(waitBetween)
 	}
 
-	sqlDB, err := DB.DB()
-	if err != nil {
-		return nil, err
-	}
-
-	log.Println("Conexión a la base de datos establecida exitosamente.")
-
-	return &Database{
-		database: DB,
-		sqlDB:    sqlDB,
-	}, nil
+	return nil, fmt.Errorf("no se pudo conectar a la base de datos después de %d intentos: %w", maxAttempts, err)
 }
 
 // GenerateDSN genera un Data Source Name (DSN) para la conexión a la base de datos.

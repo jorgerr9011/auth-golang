@@ -2,6 +2,7 @@ package auth
 
 import (
 	"errors"
+	"log"
 	"os"
 	"time"
 
@@ -13,16 +14,18 @@ var jwtSecret []byte
 var jwtRefreshSecret []byte
 
 func init() {
-	// Carga el .env (puedes cargarlo también en main, pero por si acaso lo haces aquí)
-	err := godotenv.Load()
-	if err != nil {
-		panic("Error cargando archivo .env")
+	// Cargar .env solo si no estás en producción
+	if os.Getenv("ENV") != "production" {
+		if err := godotenv.Load(); err != nil {
+			log.Println("Advertencia: no se pudo cargar .env, se usarán variables del entorno")
+		}
 	}
 
 	secret := os.Getenv("JWT_SECRET")
 	refreshSecret := os.Getenv("JWT_REFRESH_SECRET")
+
 	if secret == "" || refreshSecret == "" {
-		panic("JWT_SECRET o JWT_REFRESH_SECRET no está definido en .env")
+		log.Fatal("JWT_SECRET o JWT_REFRESH_SECRET no están definidos en el entorno")
 	}
 
 	jwtSecret = []byte(secret)

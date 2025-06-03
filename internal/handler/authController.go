@@ -34,7 +34,6 @@ func (ctrl *AuthController) RegisterUser(c *gin.Context) {
 		return
 	}
 
-	// Generar JWT para el usuario registrado
 	token, err := auth.GenerateAccessToken(user.ID)
 	refreshToken, errRefresh := auth.GenerateRefreshToken(user.ID)
 	if err != nil || errRefresh != nil {
@@ -70,7 +69,6 @@ func (ctrl *AuthController) LoginUser(c *gin.Context) {
 		return
 	}
 
-	// Generar token JWT
 	token, err := auth.GenerateAccessToken(user.ID)
 	refreshToken, errRefresh := auth.GenerateRefreshToken(user.ID)
 	if err != nil || errRefresh != nil {
@@ -109,7 +107,6 @@ func (ctrl *AuthController) RefreshToken(c *gin.Context) {
 		return
 	}
 
-	// Generar nuevo access token
 	newAccessToken, err := auth.GenerateAccessToken(user.ID)
 	if err != nil {
 		log.Println("Error al generar nuevo access token:", err)
