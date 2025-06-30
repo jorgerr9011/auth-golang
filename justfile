@@ -1,10 +1,22 @@
-migrate:
-    docker exec auth-golang-app migrate -path=/app/migrations -database "postgres://gorm:gorm_password@db:5432/gorm?sslmode=disable" drop -f
-    docker exec auth-golang-app migrate -path /app/migrations -database "postgres://gorm:gorm_password@db:5432/gorm?sslmode=disable" up
+# Carga automáticamente .env
+set dotenv-load := true
 
-migrate-production:
-    docker exec auth-golang-app migrate -path=/app/migrations -database "postgres://gorm:gorm_password@db:5432/authdb?sslmode=disable" drop -f
-    docker exec auth-golang-app migrate -path /app/migrations -database "postgres://gorm:gorm_password@db:5432/authdb?sslmode=disable" up
+# Muestra los comandos disponibles
+default:
+    @echo ""
+    @echo "Comandos disponibles:"
+    @echo ""
+    @echo "  just install               Obtiene imágenes docker y despliega el proyecto"
+    @echo "  just init                  Despliega el proyecto"
+    @echo "  just migrate               Ejecuta las migraciones"
+    @echo "  just migrate-production    Ejecuta las migraciones en producción"
+
+install: 
+    docker compose -f docker-compose.yml up --build -d
 
 init: 
-    docker-compose up -d --build
+    docker compose -f docker-compose.yml up -d
+
+migrate:
+    docker exec -it auth-golang-app migrate -path=/app/migrations -database "postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable" drop -f
+    docker exec -it auth-golang-app migrate -path /app/migrations -database "postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable" up

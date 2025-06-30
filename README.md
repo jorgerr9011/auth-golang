@@ -5,6 +5,18 @@
 
 ## Producción
 
+	En caso de querer correr instalación y migraciones, copiar .env.production a fichero
+	.env para cargar las variables de producción y poder aplicar los comandos de justfile 
+	con esas variables de entorno:
+
+	`cp .env.development .env` # desarrollo
+
+	`cp .env.production .env` #producción
+
+	`just install`
+
+	`just migrate`
+
 	`docker-compose -f docker-compose.production.yml --env-file .env.production up -d`
 
 * Para construir la imagen en producción:
