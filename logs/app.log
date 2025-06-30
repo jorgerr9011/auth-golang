@@ -1,2 +1,0 @@
-2025/06/03 17:26:34 db.go:48: Conexión a la base de datos establecida exitosamente.
-2025/06/03 17:27:06 userRepository.go:72: No se ha encontrado un usuario con el mismo correo: record not found
