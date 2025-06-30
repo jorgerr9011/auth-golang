@@ -6,10 +6,17 @@ default:
     @echo ""
     @echo "Comandos disponibles:"
     @echo ""
-    @echo "  just install               Obtiene imágenes docker y despliega el proyecto"
-    @echo "  just init                  Despliega el proyecto"
-    @echo "  just migrate               Ejecuta las migraciones"
-    @echo "  just migrate-production    Ejecuta las migraciones en producción"
+    @echo "  just install                   Obtiene imágenes docker y despliega el proyecto"
+    @echo "  just init                      Despliega el proyecto"
+    @echo "  just migrate                   Ejecuta las migraciones"
+    @echo "  just migrate-production        Ejecuta las migraciones en producción"
+    @echo "  just destroy                   Detiene y elimina contenedores, volúmenes y redes del proyecto"
+    @echo "  just clean-containers          Detiene y elimina contenedores y redes, sin borrar volúmenes"
+    @echo "  just clean-images              Elimina imágenes locales del proyecto"
+    @echo "  just clean-stopped-containers  Elimina todos los contenedores detenidos"
+    @echo "  just clean-unused-volumes      Elimina volúmenes no usados por contenedores"
+    @echo "  just clean-unused-networks     Elimina redes no usadas"
+    @echo "  just clean-all                 Limpieza completa: contenedores, imágenes, volúmenes y redes"
 
 install: 
     docker compose -f docker-compose.yml up --build -d
