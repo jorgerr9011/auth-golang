@@ -1,59 +1,67 @@
-# Arrancar contenedores
+# Sistema de autenticación en Go
 
-## Desarrollo
-	`docker-compose up -d --build`
+Este sistema implementa un flujo completo de autenticación y autorización utilizando tokens JWT para acceso seguro y escalable. Está desarrollado en Go e incluye access tokens de corta duración junto con refresh tokens persistentes para renovación segura. 
 
-## Producción
+![Licencia](https://img.shields.io/badge/Licencia-MIT-blue) ![Estado](https://img.shields.io/badge/Estado-en%20desarrollo-yellow)
 
-	En caso de querer correr instalación y migraciones, copiar .env.production a fichero
-	.env para cargar las variables de producción y poder aplicar los comandos de justfile 
-	con esas variables de entorno:
+---
 
-	`cp .env.development .env` # desarrollo
+## 🧠 Tabla de Contenidos
 
-	`cp .env.production .env` #producción
+- [Tecnologías](#tecnologías)
+- [Funcionalidades](#funcionalidades)
+- [Características](#características)
+- [Instalación](#instalación)
 
-	`just install`
+---
 
-	`just migrate`
+## 📦 Funcionalidades
 
-	`docker-compose -f docker-compose.production.yml --env-file .env.production up -d`
+* Inicio de sesión por email y password
+	- Si las credenciales son válidas el sistema genera un token temporal y un refresh token.
+	- Se devuelve el token al cliente.
+	- Refresh token se guarda en BD para poder renovar autorización del usuario. 
 
-* Para construir la imagen en producción:
+* Registro mediante datos básicos del usuario
+	- Si las credenciales son válidas, el usuario es creado en el sistema y se genera un token temporal y un refresh token.
+	- Se devuelve el token al cliente.
+	- Refresh token se guarda en BD para poder renovar autorización del usuario. 
 
-	`docker build -t jorgerr9011/proyectos:auth-golang-app_latest .`
+## 💻 Tecnologías utilizadas en el Backend
 
-* Para subir la imagen al repo:
+![Go](https://img.shields.io/badge/go-00ADD8.svg?style=for-the-badge&logo=go&logoColor=white) 
 
-	`docker push jorgerr9011/proyectos:auth-golang-app_latest`
+![postgresql](https://img.shields.io/badge/postgresql-4169E1.svg?style=for-the-badge&logo=postgresql&logoColor=white)
 
-* Ejecutar app en producción:
+![docker](https://img.shields.io/badge/docker-2496ED.svg?style=for-the-badge&logo=docker&logoColor=white)
 
-	`docker-compose -f docker-compose.production.yml --env-file .env.production up -d`
+![gin](https://img.shields.io/badge/gin-008ECF.svg?style=for-the-badge&logo=gin&logoColor=white)
 
-# Uso de golang migrate
+---
 
-## Para crear migraciones
+## ✨ Características
 
-* Esto crea 2 ficheros, uno up y otro down
-
-		`docker exec -it auth-golang-app migrate create -ext sql -dir migrations -seq create_users_table`
-
-## Aplicar migraciones
-
-	`docker exec -it auth-golang-app migrate -path /app/migrations -database "postgres://gorm:gorm_password@db:5432/gorm?sslmode=disable" up`
-
-# Realizar un fresh de las migraciones
-
-	`docker exec -it auth-golang-app migrate -path=/app/migrations -database "postgres://gorm:gorm_password@db:5432/gorm?sslmode=disable" drop -f`
-
-## Seeders
-
-* Para ejecutar los seeders de manera manual:
-
-		`go run `
-
-## Autenticación:
-
+- Escalabilidad
+- Mantenibilidad
+- Arquitectura hexagonal
 - JWT
+- Autenticación
+- Autorización
+- Refresh tokens
 
+---
+
+## 🛠️ Instalación
+
+### Requisitos
+
+- [Just](https://github.com/casey/just) — para automatizar tareas comunes del proyecto
+- [Docker](https://www.docker.com/) — para desplegar la app de manera consistente
+
+### 📦 Clonación e instalación
+
+```bash
+git clone https://github.com/jorgerr9011/auth-golang.git
+cd auth-golang
+just install
+just migrate
