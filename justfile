@@ -8,6 +8,8 @@ default:
     @echo ""
     @echo "  just install                   Obtiene imágenes docker y despliega el proyecto"
     @echo "  just init                      Despliega el proyecto"
+    @echo "  just copy-env-dev              Copia las variables de entorno de desarrollo en el .env principal"
+    @echo "  just copy-env-prod              Copia las variables de entorno de producción en el .env principal"
     @echo "  just migrate                   Ejecuta las migraciones"
     @echo "  just migrate-production        Ejecuta las migraciones en producción"
     @echo "  just destroy                   Detiene y elimina contenedores, volúmenes y redes del proyecto"
@@ -19,10 +21,17 @@ default:
     @echo "  just clean-all                 Limpieza completa: contenedores, imágenes, volúmenes y redes"
 
 install: 
+    cp .env.development .env
     docker compose -f docker-compose.yml up --build -d
 
 init: 
     docker compose -f docker-compose.yml up -d
+
+copy-env-dev: 
+    cp .env.development .env
+
+copy-env-prod: 
+    cp .env.production .env
 
 migrate:
     docker exec -it auth-golang-app migrate -path=/app/migrations -database "postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=disable" drop -f
